@@ -1,24 +1,36 @@
-import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import { Link, useRouter } from 'expo-router';
-import { useDispatch } from 'react-redux';
-import { requestVerificationCode, verifyCode } from '../api/mfaService';
-import { loginUser } from '../api/authApi';
+import { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  StyleSheet,
+  ActivityIndicator,
+  Alert,
+} from "react-native";
+import { Link, useRouter } from "expo-router";
+import { useDispatch } from "react-redux";
+import { requestVerificationCode, verifyCode } from "../api/mfaService";
+import { loginUser } from "../api/authApi";
 
 const SignIn = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [verificationCode, setVerificationCode] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [step, setStep] = useState('credentials'); // 'credentials' or 'verification'
-  const [errors, setErrors] = useState<{ email?: string; password?: string; code?: string }>({});
+  const [step, setStep] = useState("credentials"); // 'credentials' or 'verification'
+  const [errors, setErrors] = useState<{
+    email?: string;
+    password?: string;
+    code?: string;
+  }>({});
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
-    if (!email) newErrors.email = 'El correo electrónico es requerido';
-    if (!password) newErrors.password = 'La contraseña es requerida';
+    if (!email) newErrors.email = "El correo electrónico es requerido";
+    if (!password) newErrors.password = "La contraseña es requerida";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -26,7 +38,8 @@ const SignIn = () => {
 
   const validateCode = () => {
     const newErrors: { code?: string } = {};
-    if (!verificationCode) newErrors.code = 'El código de verificación es requerido';
+    if (!verificationCode)
+      newErrors.code = "El código de verificación es requerido";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -38,10 +51,16 @@ const SignIn = () => {
     setIsLoading(true);
     try {
       const response = await requestVerificationCode(email);
-      setStep('verification');
-      Alert.alert('Código enviado', 'Se ha enviado un código de verificación a tu correo electrónico.');
+      setStep("verification");
+      Alert.alert(
+        "Código enviado",
+        "Se ha enviado un código de verificación a tu correo electrónico."
+      );
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo enviar el código de verificación');
+      Alert.alert(
+        "Error",
+        error.message || "No se pudo enviar el código de verificación"
+      );
     } finally {
       setIsLoading(false);
     }
@@ -52,20 +71,24 @@ const SignIn = () => {
 
     setIsLoading(true);
     try {
-      const verificationResponse = await verifyCode(email, verificationCode, password);
+      const verificationResponse = await verifyCode(
+        email,
+        verificationCode,
+        password
+      );
       // Una vez verificado el código, iniciamos sesión con las credenciales
       await loginUser(email, password, dispatch);
-      router.replace('/(admin)'); // Redirect to admin screen after successful verification
+      router.replace("/(admin)"); // Redirect to admin screen after successful verification
     } catch (error: any) {
-      Alert.alert('Error', error.message || 'No se pudo verificar el código');
+      Alert.alert("Error", error.message || "No se pudo verificar el código");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleBackToCredentials = () => {
-    setStep('credentials');
-    setVerificationCode('');
+    setStep("credentials");
+    setVerificationCode("");
   };
 
   return (
@@ -73,11 +96,13 @@ const SignIn = () => {
       <View style={styles.header}>
         <Text style={styles.title}>Iniciar Sesión</Text>
         <Text style={styles.subtitle}>
-          {step === 'credentials' ? 'Ingresa tus credenciales para continuar' : 'Ingresa el código de verificación enviado a tu correo'}
+          {step === "credentials"
+            ? "Ingresa tus credenciales para continuar"
+            : "Ingresa el código de verificación enviado a tu correo"}
         </Text>
       </View>
 
-      {step === 'credentials' ? (
+      {step === "credentials" ? (
         <View style={styles.form}>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Correo Electrónico</Text>
@@ -89,7 +114,9 @@ const SignIn = () => {
               keyboardType="email-address"
               autoCapitalize="none"
             />
-            {errors.email && <Text style={styles.errorText}>{errors.email}</Text>}
+            {errors.email && (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            )}
           </View>
 
           <View style={styles.inputContainer}>
@@ -101,11 +128,13 @@ const SignIn = () => {
               placeholder="Tu contraseña"
               secureTextEntry
             />
-            {errors.password && <Text style={styles.errorText}>{errors.password}</Text>}
+            {errors.password && (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            )}
           </View>
 
-          <TouchableOpacity 
-            style={styles.button} 
+          <TouchableOpacity
+            style={styles.button}
             onPress={handleRequestCode}
             disabled={isLoading}
           >
@@ -140,8 +169,8 @@ const SignIn = () => {
             {errors.code && <Text style={styles.errorText}>{errors.code}</Text>}
           </View>
 
-          <TouchableOpacity 
-            style={styles.button} 
+          <TouchableOpacity
+            style={styles.button}
             onPress={handleVerifyCode}
             disabled={isLoading}
           >
@@ -152,15 +181,15 @@ const SignIn = () => {
             )}
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.secondaryButton} 
+          <TouchableOpacity
+            style={styles.secondaryButton}
             onPress={handleBackToCredentials}
           >
             <Text style={styles.secondaryButtonText}>Volver</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity 
-            style={styles.resendButton} 
+          <TouchableOpacity
+            style={styles.resendButton}
             onPress={handleRequestCode}
             disabled={isLoading}
           >
@@ -175,7 +204,7 @@ const SignIn = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     padding: 20,
   },
   header: {
@@ -184,15 +213,15 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 28,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   subtitle: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   form: {
-    width: '100%',
+    width: "100%",
   },
   inputContainer: {
     marginBottom: 20,
@@ -200,66 +229,66 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 16,
     marginBottom: 8,
-    fontWeight: '500',
+    fontWeight: "500",
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: "#ddd",
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
   },
   errorText: {
-    color: 'red',
+    color: "red",
     fontSize: 14,
     marginTop: 5,
   },
   button: {
-    backgroundColor: '#4A55A2',
+    backgroundColor: "#4A55A2",
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 20,
   },
   buttonText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   secondaryButton: {
-    backgroundColor: '#f0f0f0',
+    backgroundColor: "#f0f0f0",
     padding: 15,
     borderRadius: 10,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
   },
   secondaryButtonText: {
-    color: '#333',
+    color: "#333",
     fontSize: 16,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   resendButton: {
     padding: 15,
-    alignItems: 'center',
+    alignItems: "center",
     marginTop: 10,
   },
   resendButtonText: {
-    color: '#4A55A2',
+    color: "#4A55A2",
     fontSize: 16,
   },
   footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     marginTop: 20,
   },
   footerText: {
     fontSize: 16,
-    color: '#666',
+    color: "#666",
   },
   linkText: {
     fontSize: 16,
-    color: '#4A55A2',
-    fontWeight: 'bold',
+    color: "#4A55A2",
+    fontWeight: "bold",
   },
 });
 

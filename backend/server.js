@@ -14,7 +14,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(cors({
-  origin: ['http://localhost:8081', 'http://localhost:19006', 'http://localhost:3000', 'https://6074-177-249-162-57.ngrok-free.app'],
+  origin: ['http://localhost:8081', 'http://localhost:19006', 'http://localhost:3000', 'https://8b50-177-249-162-57.ngrok-free.app'],
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
