@@ -37,7 +37,8 @@ const SignIn = () => {
 
     setIsLoading(true);
     try {
-      const response = await requestVerificationCode(email);
+      // Verificar email y contraseña antes de solicitar el código
+      const response = await requestVerificationCode(email, password);
       setStep('verification');
       Alert.alert('Código enviado', 'Se ha enviado un código de verificación a tu correo electrónico.');
     } catch (error: any) {
