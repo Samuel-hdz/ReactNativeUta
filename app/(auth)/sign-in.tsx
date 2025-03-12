@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
 import { Link, useRouter } from 'expo-router';
 import { useDispatch } from 'react-redux';
-import { login } from '../store/slices/authSlice';
 import { requestVerificationCode, verifyCode } from '../api/mfaService';
+import { loginUser } from '../api/authApi';
 
 const SignIn = () => {
   const router = useRouter();
@@ -52,8 +52,9 @@ const SignIn = () => {
 
     setIsLoading(true);
     try {
-      const response = await verifyCode(email, verificationCode, password);
-      dispatch(login(response));
+      const verificationResponse = await verifyCode(email, verificationCode, password);
+      // Una vez verificado el código, iniciamos sesión con las credenciales
+      await loginUser(email, password, dispatch);
       router.replace('/(admin)'); // Redirect to admin screen after successful verification
     } catch (error: any) {
       Alert.alert('Error', error.message || 'No se pudo verificar el código');
