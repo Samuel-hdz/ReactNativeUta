@@ -12,19 +12,9 @@ const generateCode = () => {
 };
 
 // Solicitar código de verificación al iniciar sesión
-// Función para sanitizar entradas
-const sanitizeInput = (input) => {
-  if (typeof input !== 'string') return input;
-  // Eliminar caracteres peligrosos
-  return input.replace(/[<>"'`;=]/g, '');
-};
-
 router.post('/request-code', async (req, res) => {
   try {
-    // Sanitizar entradas
-    const email = sanitizeInput(req.body.email);
-    const password = sanitizeInput(req.body.password);
-    
+    const { email, password } = req.body;
     console.log('Solicitud de código para:', email);
 
     // Buscar el usuario
@@ -71,11 +61,7 @@ router.post('/request-code', async (req, res) => {
 // Verificar código y completar inicio de sesión
 router.post('/verify-code', async (req, res) => {
   try {
-    // Sanitizar entradas
-    const email = sanitizeInput(req.body.email);
-    const code = sanitizeInput(req.body.code);
-    const password = sanitizeInput(req.body.password);
-    
+    const { email, code, password } = req.body;
     console.log('Verificando código para:', email);
     console.log('Código recibido:', code);
 
