@@ -1,12 +1,12 @@
-
 import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert } from 'react-native';
-import { Link } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { useDispatch } from 'react-redux';
 import { login } from '../store/slices/authSlice';
 import { requestVerificationCode, verifyCode } from '../api/mfaService';
 
 const SignIn = () => {
+  const router = useRouter();
   const dispatch = useDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,7 +19,7 @@ const SignIn = () => {
     const newErrors: { email?: string; password?: string } = {};
     if (!email) newErrors.email = 'El correo electrónico es requerido';
     if (!password) newErrors.password = 'La contraseña es requerida';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -27,14 +27,14 @@ const SignIn = () => {
   const validateCode = () => {
     const newErrors: { code?: string } = {};
     if (!verificationCode) newErrors.code = 'El código de verificación es requerido';
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleRequestCode = async () => {
     if (!validateForm()) return;
-    
+
     setIsLoading(true);
     try {
       const response = await requestVerificationCode(email);
@@ -49,11 +49,12 @@ const SignIn = () => {
 
   const handleVerifyCode = async () => {
     if (!validateCode()) return;
-    
+
     setIsLoading(true);
     try {
       const response = await verifyCode(email, verificationCode, password);
       dispatch(login(response));
+      router.replace('/(admin)'); // Redirect to admin screen after successful verification
     } catch (error: any) {
       Alert.alert('Error', error.message || 'No se pudo verificar el código');
     } finally {
@@ -74,7 +75,7 @@ const SignIn = () => {
           {step === 'credentials' ? 'Ingresa tus credenciales para continuar' : 'Ingresa el código de verificación enviado a tu correo'}
         </Text>
       </View>
-      
+
       {step === 'credentials' ? (
         <View style={styles.form}>
           <View style={styles.inputContainer}>
