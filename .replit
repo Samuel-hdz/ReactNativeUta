@@ -1,0 +1,43 @@
+modules = ["nodejs-20"]
+run = "npm run start"
+
+[nix]
+channel = "stable-24_05"
+
+[deployment]
+run = ["sh", "-c", "npm run start"]
+
+[[ports]]
+localPort = 5000
+externalPort = 5000
+
+[[ports]]
+localPort = 8081
+externalPort = 80
+
+[workflows]
+runButton = "Backend Server"
+
+[[workflows.workflow]]
+name = "Backend"
+author = 40387338
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend && npm run dev"
+
+[[workflows.workflow]]
+name = "Full Stack"
+author = 40387338
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "npx concurrently \"cd backend && npm run dev\" \"npx expo start\""
+
+[[workflows.workflow]]
+name = "Backend Server"
+author = 40387338
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd backend && node server.js"
