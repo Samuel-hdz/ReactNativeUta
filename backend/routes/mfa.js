@@ -1,3 +1,4 @@
+
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
@@ -14,21 +15,12 @@ const generateCode = () => {
 // Solicitar código de verificación al iniciar sesión
 router.post('/request-code', async (req, res) => {
   try {
-    const { email, password } = req.body;
-    console.log('Solicitud de código para:', email);
+    const { email } = req.body;
 
-    // Buscar el usuario
+    // Verificar si el correo existe
     const user = await User.findOne({ email });
     if (!user) {
-      console.log('Error: Usuario no encontrado:', email);
       return res.status(404).json({ message: 'Usuario no encontrado' });
-    }
-
-    // Verificar la contraseña antes de enviar el código
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      console.log('Error: Contraseña incorrecta para usuario:', email);
-      return res.status(400).json({ message: 'Credenciales incorrectas' });
     }
 
     // Generar un código de verificación
@@ -41,7 +33,7 @@ router.post('/request-code', async (req, res) => {
     // Enviar código por correo electrónico
     try {
       await sendVerificationCode(email, code);
-
+      
       return res.status(200).json({ 
         message: 'Código de verificación enviado. Por favor, revisa tu correo electrónico.' 
       });
