@@ -11,9 +11,20 @@ import { RootState } from '../store/store';
 import { registerUser } from '../api/authApi';
 
 const RegisterSchema = Yup.object().shape({
-  name: Yup.string().required('Nombre requerido'),
-  email: Yup.string().email('Correo electrónico inválido').required('Correo electrónico requerido'),
-  password: Yup.string().min(6, 'La contraseña debe tener al menos 6 caracteres').required('Contraseña requerida'),
+  name: Yup.string()
+    .required('Nombre requerido')
+    .trim()
+    .matches(/^[^<>%$'"`;=]+$/, 'Caracteres no permitidos'),
+  email: Yup.string()
+    .email('Correo electrónico inválido')
+    .required('Correo electrónico requerido')
+    .trim()
+    .matches(/^[^<>%$'"`;=]+$/, 'Caracteres no permitidos'),
+  password: Yup.string()
+    .min(6, 'La contraseña debe tener al menos 6 caracteres')
+    .required('Contraseña requerida')
+    .trim()
+    .matches(/^[^<>%$'"`;=]+$/, 'Caracteres no permitidos'),
   confirmPassword: Yup.string()
     .oneOf([Yup.ref('password')], 'Las contraseñas deben coincidir')
     .required('Confirma tu contraseña')
@@ -24,10 +35,20 @@ const SignUpScreen = () => {
   const dispatch = useDispatch();
   const { isLoading, error } = useSelector((state: RootState) => state.auth);
 
+  // Función para sanitizar entradas
+  const sanitizeInput = (input: string) => {
+    return input.replace(/[<>"'`;=]/g, '');
+  };
+
   const handleRegister = async (values: { name: string; email: string; password: string }) => {
     try {
-      await registerUser(values.name, values.email, values.password, dispatch);
-      console.log('Registration successful with:', values);
+      // Sanitizar inputs antes de enviar
+      const sanitizedName = sanitizeInput(values.name);
+      const sanitizedEmail = sanitizeInput(values.email);
+      const sanitizedPassword = sanitizeInput(values.password);
+
+      await registerUser(sanitizedName, sanitizedEmail, sanitizedPassword, dispatch);
+      console.log('Registration successful');
       router.replace('/(admin)');
     } catch (error) {
       console.error('Registration failed:', error);
